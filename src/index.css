@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+@theme {
+  /* ── Thistle ──────────────────────────────────────── */
+  --color-thistle:     #cdb4db;
+  --color-thistle-100: #2b1a36;
+  --color-thistle-200: #57346b;
+  --color-thistle-300: #824ea1;
+  --color-thistle-400: #a87ec1;
+  --color-thistle-500: #cdb4db;
+  --color-thistle-600: #d6c2e2;
+  --color-thistle-700: #e0d2e9;
+  --color-thistle-800: #ebe1f0;
+  --color-thistle-900: #f5f0f8;
+
+  /* ── Pastel Petal ─────────────────────────────────── */
+  --color-pastel_petal:     #ffc8dd;
+  --color-pastel_petal-100: #5b0023;
+  --color-pastel_petal-200: #b60046;
+  --color-pastel_petal-300: #ff116c;
+  --color-pastel_petal-400: #ff6ca4;
+  --color-pastel_petal-500: #ffc8dd;
+  --color-pastel_petal-600: #ffd2e3;
+  --color-pastel_petal-700: #ffddea;
+  --color-pastel_petal-800: #ffe9f1;
+  --color-pastel_petal-900: #fff4f8;
+
+  /* ── Baby Pink ────────────────────────────────────── */
+  --color-baby_pink:     #ffafcc;
+  --color-baby_pink-100: #56001f;
+  --color-baby_pink-200: #ab003f;
+  --color-baby_pink-300: #ff025f;
+  --color-baby_pink-400: #ff5895;
+  --color-baby_pink-500: #ffafcc;
+  --color-baby_pink-600: #ffbed6;
+  --color-baby_pink-700: #ffcee0;
+  --color-baby_pink-800: #ffdeea;
+  --color-baby_pink-900: #ffeff5;
+
+  /* ── Icy Blue ─────────────────────────────────────── */
+  --color-icy_blue:     #bde0fe;
+  --color-icy_blue-100: #012f57;
+  --color-icy_blue-200: #035eaf;
+  --color-icy_blue-300: #0f8dfb;
+  --color-icy_blue-400: #66b6fd;
+  --color-icy_blue-500: #bde0fe;
+  --color-icy_blue-600: #cbe6fe;
+  --color-icy_blue-700: #d8ecfe;
+  --color-icy_blue-800: #e5f3ff;
+  --color-icy_blue-900: #f2f9ff;
+
+  /* ── Sky Blue ─────────────────────────────────────── */
+  --color-sky_blue:     #a2d2ff;
+  --color-sky_blue-100: #002b54;
+  --color-sky_blue-200: #0056a7;
+  --color-sky_blue-300: #0082fb;
+  --color-sky_blue-400: #50aaff;
+  --color-sky_blue-500: #a2d2ff;
+  --color-sky_blue-600: #b6dcff;
+  --color-sky_blue-700: #c8e4ff;
+  --color-sky_blue-800: #daedff;
+  --color-sky_blue-900: #edf6ff;
+}

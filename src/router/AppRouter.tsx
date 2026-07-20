@@ -14,13 +14,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { UserRole } from '@/types';
 import ProtectedRoute from './ProtectedRoute';
+import MainLayout from '@/components/layout/MainLayout';
+import HomePage from '@/features/reports/pages/HomePage';
 
 // ---------------------------------------------------------------------------
 // Placeholders de páginas — serán reemplazados por los componentes reales
 // ---------------------------------------------------------------------------
 
 // Públicas
-const HomePage = () => <div data-testid="page-home">HomePage — Placeholder</div>;
 const ReportListPage = () => <div data-testid="page-report-list">ReportListPage — Placeholder</div>;
 const ReportDetailPage = () => <div data-testid="page-report-detail">ReportDetailPage — Placeholder</div>;
 const LoginPage = () => <div data-testid="page-login">LoginPage — Placeholder</div>;
@@ -79,18 +80,20 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         {/* ---------------------------------------------------------------- */}
-        {/* RUTAS PÚBLICAS                                                    */}
+        {/* RUTAS PÚBLICAS — envueltas en MainLayout (Header + Footer)       */}
         {/* ---------------------------------------------------------------- */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/reportes" element={<ReportListPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/reportes" element={<ReportListPage />} />
 
-        {/* Detalle público — /reportes/:id DEBE ir antes que /reportes/nuevo
-            para evitar que "nuevo" sea interpretado como un :id */}
-        <Route path="/reportes/:id" element={<ReportDetailPage />} />
+          {/* Detalle público — /reportes/:id DEBE ir antes que /reportes/nuevo
+              para evitar que "nuevo" sea interpretado como un :id */}
+          <Route path="/reportes/:id" element={<ReportDetailPage />} />
 
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/registro" element={<RegisterPage />} />
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        </Route>
 
         {/* ---------------------------------------------------------------- */}
         {/* RUTAS PRIVADAS — requieren autenticación                          */}
