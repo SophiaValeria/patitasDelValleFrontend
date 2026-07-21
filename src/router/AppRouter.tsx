@@ -27,9 +27,9 @@ import LoginPage from '@/features/auth/pages/LoginPage';
 import UserProfilePage from '@/features/user/pages/UserProfilePage';
 import UserDashboardPage from '@/features/user/pages/UserDashboardPage';
 import ReportDetailPage from '@/features/reports/pages/ReportDetailPage';
+import ReportListPage from '@/features/reports/pages/ReportListPage';
 
 // Públicas
-const ReportListPage = () => <div data-testid="page-report-list">ReportListPage — Placeholder</div>;
 const NotFoundPage = () => <div data-testid="page-not-found">404 — Página no encontrada</div>;
 const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No autorizado</div>;
 
