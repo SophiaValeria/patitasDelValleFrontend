@@ -182,9 +182,13 @@ const TYPE_CONFIG: Record<ReportType, { label: string; badge: string; badgeBg: s
 // ---------------------------------------------------------------------------
 
 const ReportCard = ({ report }: { report: MockReport }) => {
+  const navigate = useNavigate();
   const config = TYPE_CONFIG[report.type] || TYPE_CONFIG[ReportType.LOST];
   return (
-    <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border border-thistle-700">
+    <article
+      onClick={() => navigate(`/reportes/${report.id}`)}
+      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border border-thistle-700"
+    >
       <div className="relative h-48 overflow-hidden">
         <img
           src={report.image}
