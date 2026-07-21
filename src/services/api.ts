@@ -22,7 +22,7 @@ import axios, {
 const TOKEN_KEY = 'patitas_token';
 
 /** URL base de la API leída desde variables de entorno de Vite */
-const BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:5000/api';
+const BASE_URL = import.meta.env['VITE_API_URL'] ?? 'http://localhost:3000/api/v1';
 
 // ---------------------------------------------------------------------------
 // Instancia de Axios

@@ -22,11 +22,12 @@ import CreateReportPage from '@/features/reports/pages/CreateReportPage';
 // Placeholders de páginas — serán reemplazados por los componentes reales
 // ---------------------------------------------------------------------------
 
+import RegisterPage from '@/features/auth/pages/RegisterPage';
+import LoginPage from '@/features/auth/pages/LoginPage';
+
 // Públicas
 const ReportListPage = () => <div data-testid="page-report-list">ReportListPage — Placeholder</div>;
 const ReportDetailPage = () => <div data-testid="page-report-detail">ReportDetailPage — Placeholder</div>;
-const LoginPage = () => <div data-testid="page-login">LoginPage — Placeholder</div>;
-const RegisterPage = () => <div data-testid="page-register">RegisterPage — Placeholder</div>;
 const NotFoundPage = () => <div data-testid="page-not-found">404 — Página no encontrada</div>;
 const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No autorizado</div>;
 
@@ -70,11 +71,20 @@ const AdminReportDetailPage = () => <div data-testid="page-admin-report-detail">
  * *                          → NotFoundPage (catch-all)
  * ```
  */
+import useAuth from '@/hooks/useAuth';
+
 const AppRouter = () => {
-  // TODO: Reemplazar estos valores hardcodeados con el contexto de autenticación
-  // const { isAuthenticated, user } = useAuth();
-  const isAuthenticated = false;
-  const userRole = UserRole.USER;
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const userRole = user?.role ?? UserRole.USER;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-thistle-900 flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 rounded-full border-4 border-baby_pink-400 border-t-transparent animate-spin" />
+        <p className="text-thistle-200 font-medium text-sm animate-pulse">Cargando aplicación...</p>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>

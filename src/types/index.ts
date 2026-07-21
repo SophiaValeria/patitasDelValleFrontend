@@ -81,7 +81,17 @@ export interface User {
   email: string;
   /** Rol que determina los permisos de navegación */
   role: UserRole;
-  /** URL del avatar del usuario (opcional) */
+  /** RUT del usuario */
+  rut: string;
+  /** Celular de contacto */
+  phone: string;
+  /** Dirección completa */
+  address: string;
+  /** Región chilena */
+  region: string;
+  /** Comuna chilena */
+  commune: string;
+  /** URL del avatar del usuario (opcional, base64 o URL) */
   avatarUrl?: string;
   /** Fecha de creación de la cuenta (ISO 8601) */
   createdAt: string;
@@ -175,4 +185,10 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+  rut: string;
+  phone: string;
+  address: string;
+  region: string;
+  commune: string;
+  avatarUrl?: string;
 }
