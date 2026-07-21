@@ -16,6 +16,7 @@ import { UserRole } from '@/types';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
 import HomePage from '@/features/reports/pages/HomePage';
+import CreateReportPage from '@/features/reports/pages/CreateReportPage';
 
 // ---------------------------------------------------------------------------
 // Placeholders de páginas — serán reemplazados por los componentes reales
@@ -31,7 +32,6 @@ const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No a
 
 // Privadas (usuario autenticado)
 const UserDashboardPage = () => <div data-testid="page-user-dashboard">UserDashboardPage — Placeholder</div>;
-const CreateReportPage = () => <div data-testid="page-create-report">CreateReportPage — Placeholder</div>;
 const EditReportPage = () => <div data-testid="page-edit-report">EditReportPage — Placeholder</div>;
 const UserProfilePage = () => <div data-testid="page-user-profile">UserProfilePage — Placeholder</div>;
 
@@ -86,8 +86,11 @@ const AppRouter = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/reportes" element={<ReportListPage />} />
 
-          {/* Detalle público — /reportes/:id DEBE ir antes que /reportes/nuevo
-              para evitar que "nuevo" sea interpretado como un :id */}
+          {/* TODO: Mover a zona privada cuando el AuthContext esté implementado */}
+          {/* /reportes/nuevo va ANTES que /reportes/:id para evitar conflicto de matching */}
+          <Route path="/reportes/nuevo" element={<CreateReportPage />} />
+
+          {/* Detalle público — /reportes/:id va DESPUÉS de las rutas específicas */}
           <Route path="/reportes/:id" element={<ReportDetailPage />} />
 
           <Route path="/login" element={<LoginPage />} />
@@ -107,6 +110,7 @@ const AppRouter = () => {
           }
         >
           <Route path="/dashboard" element={<UserDashboardPage />} />
+          {/* /reportes/nuevo DEBE ir antes de /reportes/:id en el árbol de rutas privadas */}
           <Route path="/reportes/nuevo" element={<CreateReportPage />} />
           <Route path="/reportes/:id/editar" element={<EditReportPage />} />
           <Route path="/perfil" element={<UserProfilePage />} />
