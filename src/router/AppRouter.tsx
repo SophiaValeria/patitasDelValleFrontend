@@ -24,6 +24,8 @@ import CreateReportPage from '@/features/reports/pages/CreateReportPage';
 
 import RegisterPage from '@/features/auth/pages/RegisterPage';
 import LoginPage from '@/features/auth/pages/LoginPage';
+import UserProfilePage from '@/features/user/pages/UserProfilePage';
+import UserDashboardPage from '@/features/user/pages/UserDashboardPage';
 
 // Públicas
 const ReportListPage = () => <div data-testid="page-report-list">ReportListPage — Placeholder</div>;
@@ -32,9 +34,7 @@ const NotFoundPage = () => <div data-testid="page-not-found">404 — Página no 
 const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No autorizado</div>;
 
 // Privadas (usuario autenticado)
-const UserDashboardPage = () => <div data-testid="page-user-dashboard">UserDashboardPage — Placeholder</div>;
 const EditReportPage = () => <div data-testid="page-edit-report">EditReportPage — Placeholder</div>;
-const UserProfilePage = () => <div data-testid="page-user-profile">UserProfilePage — Placeholder</div>;
 
 // Administrativas
 const AdminDashboardPage = () => <div data-testid="page-admin-dashboard">AdminDashboardPage — Placeholder</div>;
@@ -90,13 +90,12 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
         {/* ---------------------------------------------------------------- */}
-        {/* RUTAS PÚBLICAS — envueltas en MainLayout (Header + Footer)       */}
+        {/* RUTAS EN MAIN LAYOUT (Header + Footer)                           */}
         {/* ---------------------------------------------------------------- */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/reportes" element={<ReportListPage />} />
 
-          {/* TODO: Mover a zona privada cuando el AuthContext esté implementado */}
           {/* /reportes/nuevo va ANTES que /reportes/:id para evitar conflicto de matching */}
           <Route path="/reportes/nuevo" element={<CreateReportPage />} />
 
@@ -106,24 +105,20 @@ const AppRouter = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegisterPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        </Route>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* RUTAS PRIVADAS — requieren autenticación                          */}
-        {/* ---------------------------------------------------------------- */}
-        <Route
-          element={
-            <ProtectedRoute
-              isAuthenticated={isAuthenticated}
-              redirectTo="/login"
-            />
-          }
-        >
-          <Route path="/dashboard" element={<UserDashboardPage />} />
-          {/* /reportes/nuevo DEBE ir antes de /reportes/:id en el árbol de rutas privadas */}
-          <Route path="/reportes/nuevo" element={<CreateReportPage />} />
-          <Route path="/reportes/:id/editar" element={<EditReportPage />} />
-          <Route path="/perfil" element={<UserProfilePage />} />
+          {/* RUTAS PRIVADAS (con Header y Footer) */}
+          <Route
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                redirectTo="/login"
+              />
+            }
+          >
+            <Route path="/dashboard" element={<UserDashboardPage />} />
+            <Route path="/reportes/:id/editar" element={<EditReportPage />} />
+            <Route path="/perfil" element={<UserProfilePage />} />
+          </Route>
         </Route>
 
         {/* ---------------------------------------------------------------- */}
