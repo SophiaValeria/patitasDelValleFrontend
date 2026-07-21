@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { ReportType } from '@/types';
+import apiClient from '@/services/api';
 import type { ReportFormData } from '../types/form.types';
 import { INITIAL_FORM_DATA, REPORT_TYPE_CONFIGS } from '../types/form.types';
 import Step1Photos from './steps/Step1Photos';
@@ -215,11 +216,25 @@ const ReportFormWizard = ({ reportType, onBack }: ReportFormWizardProps) => {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    // TODO: Integrar con la API del backend cuando esté disponible
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsSubmitting(false);
-    setSubmitted(true);
+    try {
+      setIsSubmitting(true);
+      setValidationError(null);
+
+      const res = await apiClient.post('/reports', formData);
+
+      if (res.data && res.data.success) {
+        setSubmitted(true);
+      } else {
+        setValidationError(res.data?.message || 'No se pudo crear el reporte.');
+      }
+    } catch (err: any) {
+      console.error('Error al publicar el reporte:', err);
+      setValidationError(
+        err.response?.data?.message || 'Ocurrió un error al intentar guardar el reporte en la base de datos.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ── Pantalla de éxito ──

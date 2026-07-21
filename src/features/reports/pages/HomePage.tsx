@@ -9,9 +9,10 @@
  *  4. CTA de reporte flotante
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReportType } from '@/types';
+import apiClient from '@/services/api';
 
 // ---------------------------------------------------------------------------
 // Tipos locales
@@ -31,7 +32,44 @@ interface MockReport {
 }
 
 // ---------------------------------------------------------------------------
-// Datos mock
+// Helper para dar formato a la ubicación (soporta string u objeto Mongo)
+// ---------------------------------------------------------------------------
+
+const formatLocation = (loc: any): string => {
+  if (!loc) return 'Chile';
+  if (typeof loc === 'string') return loc;
+  const parts = [];
+  if (loc.comuna) parts.push(loc.comuna);
+  if (loc.region) parts.push(loc.region);
+  return parts.length > 0 ? parts.join(', ') : loc.address || 'Chile';
+};
+
+const formatDate = (dateStr: any): string => {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch {
+    return String(dateStr);
+  }
+};
+
+const normalizeReport = (raw: any): MockReport => {
+  return {
+    id: raw._id || raw.id || String(Math.random()),
+    type: raw.type || ReportType.LOST,
+    petName: raw.animalInfo?.name || raw.petName || 'Sin Nombre',
+    species: raw.animalInfo?.species || raw.species || 'Mascota',
+    location: formatLocation(raw.location),
+    date: formatDate(raw.createdAt || raw.date),
+    image: (Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image) || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80',
+    color: raw.animalInfo?.color || raw.color || '',
+  };
+};
+
+// ---------------------------------------------------------------------------
+// Datos mock de respaldo
 // ---------------------------------------------------------------------------
 
 const MOCK_REPORTS: MockReport[] = [
@@ -144,7 +182,7 @@ const TYPE_CONFIG: Record<ReportType, { label: string; badge: string; badgeBg: s
 // ---------------------------------------------------------------------------
 
 const ReportCard = ({ report }: { report: MockReport }) => {
-  const config = TYPE_CONFIG[report.type];
+  const config = TYPE_CONFIG[report.type] || TYPE_CONFIG[ReportType.LOST];
   return (
     <article className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border border-thistle-700">
       <div className="relative h-48 overflow-hidden">
@@ -166,7 +204,7 @@ const ReportCard = ({ report }: { report: MockReport }) => {
           <span className="text-xs text-thistle-500 whitespace-nowrap">{report.date}</span>
         </div>
         <p className="text-sm text-thistle-400 mb-3">
-          {report.species} · {report.color}
+          {report.species} {report.color ? `· ${report.color}` : ''}
         </p>
         <div className="flex items-center gap-1 text-xs text-thistle-400">
           <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +212,7 @@ const ReportCard = ({ report }: { report: MockReport }) => {
               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          {report.location}
+          {formatLocation(report.location)}
         </div>
       </div>
     </article>
@@ -188,6 +226,9 @@ const ReportCard = ({ report }: { report: MockReport }) => {
 const HomePage = () => {
   const navigate = useNavigate();
 
+  const [reports, setReports] = useState<MockReport[]>(MOCK_REPORTS);
+  const [isLoading, setIsLoading] = useState(false);
+
   // Estado de filtros
   const [activeType, setActiveType] = useState<ActiveFilter>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -197,15 +238,34 @@ const HomePage = () => {
   const [selectedComuna, setSelectedComuna] = useState('');
   const [selectedSpecies, setSelectedSpecies] = useState('');
 
-  // Filtrado de reportes mock
-  const filtered = MOCK_REPORTS.filter((r) => {
+  // Cargar reportes desde la API de backend
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setIsLoading(true);
+        const res = await apiClient.get('/reports');
+        if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+          const normalized = res.data.data.map(normalizeReport);
+          setReports(normalized);
+        }
+      } catch (err) {
+        console.error('Error al cargar reportes desde backend:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchReports();
+  }, []);
+
+  // Filtrado de reportes
+  const filtered = reports.filter((r) => {
     const matchType = activeType ? r.type === activeType : true;
     const matchSearch =
       searchQuery === '' ||
       r.petName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.species.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchSpecies = selectedSpecies === '' || r.species === selectedSpecies;
+    const matchSpecies = selectedSpecies === '' || r.species.toLowerCase().includes(selectedSpecies.toLowerCase());
     return matchType && matchSearch && matchSpecies;
   });
 

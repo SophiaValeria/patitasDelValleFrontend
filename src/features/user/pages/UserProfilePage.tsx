@@ -67,15 +67,50 @@ const UserProfilePage: React.FC = () => {
 
   // Intentar cargar reportes desde la API si la ruta está disponible
   useEffect(() => {
+    const formatLocation = (loc: any): string => {
+      if (!loc) return 'Ubicación no especificada';
+      if (typeof loc === 'string') return loc;
+      const parts = [];
+      if (loc.comuna) parts.push(loc.comuna);
+      if (loc.region) parts.push(loc.region);
+      return parts.length > 0 ? parts.join(', ') : loc.address || 'Ubicación no especificada';
+    };
+
+    const formatDate = (dateStr: any): string => {
+      if (!dateStr) return 'Fecha no especificada';
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return String(dateStr);
+        return d.toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch {
+        return String(dateStr);
+      }
+    };
+
+    const normalizeUserReport = (raw: any): UserReport => {
+      return {
+        id: raw._id || raw.id || String(Math.random()),
+        type: raw.type || ReportType.LOST,
+        petName: raw.animalInfo?.name || raw.petName || 'Sin Nombre',
+        species: raw.animalInfo?.species || raw.species || 'Mascota',
+        breed: raw.animalInfo?.breed || raw.breed,
+        status: raw.status || ReportStatus.ACTIVE,
+        date: formatDate(raw.createdAt || raw.date),
+        location: formatLocation(raw.location),
+        image: (Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image) || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80',
+      };
+    };
+
     const fetchUserReports = async () => {
       try {
         setIsLoadingReports(true);
         const res = await apiClient.get('/reports/my-reports');
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
-          setReports(res.data.data);
+          const normalized = res.data.data.map(normalizeUserReport);
+          setReports(normalized);
         }
       } catch (err) {
-        // En caso de que la API de reportes propios aún no esté activa en backend,
+        // En caso de que la API de reportes propios falle o retorne error,
         // mantenemos los datos mock para que el frontend funcione fluidamente.
       } finally {
         setIsLoadingReports(false);
