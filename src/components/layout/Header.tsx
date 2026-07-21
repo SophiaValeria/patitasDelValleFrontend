@@ -27,11 +27,7 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navLinks = [
-    { label: 'Mascotas Perdidas', href: '/reportes?tipo=perdida' },
-    { label: 'En Adopción', href: '/reportes?tipo=adopcion' },
-    { label: 'Encontradas', href: '/reportes?tipo=encontrada' },
-  ];
+
 
   const handleLogout = () => {
     logout();
@@ -68,18 +64,7 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* ── Nav Desktop ── */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-thistle-200 hover:bg-thistle-800 hover:text-thistle-100 transition-colors duration-200"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+
 
           {/* ── Actions Desktop ── */}
           <div className="hidden lg:flex items-center gap-3">
@@ -243,16 +228,7 @@ const Header = () => {
               </div>
             )}
 
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-sm font-medium text-thistle-200 hover:bg-thistle-900 transition-colors min-h-[44px] flex items-center"
-              >
-                {link.label}
-              </Link>
-            ))}
+
 
             <div className="border-t border-thistle-700 mt-2 pt-3 flex flex-col gap-2">
               <button
