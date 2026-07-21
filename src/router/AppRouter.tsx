@@ -87,7 +87,7 @@ const AppRouter = () => {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         {/* ---------------------------------------------------------------- */}
         {/* RUTAS EN MAIN LAYOUT (Header + Footer)                           */}

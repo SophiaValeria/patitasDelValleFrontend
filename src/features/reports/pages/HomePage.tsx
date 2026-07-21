@@ -562,7 +562,12 @@ const HomePage = () => {
         )}
 
         {/* ── Grid de tarjetas ── */}
-        {filtered.length > 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+            <div className="w-10 h-10 border-4 border-baby_pink-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-thistle-300 font-medium">Cargando reportes...</p>
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((report) => (
               <ReportCard key={report.id} report={report} />
