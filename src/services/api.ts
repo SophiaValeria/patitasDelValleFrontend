@@ -204,8 +204,9 @@ apiClient.interceptors.response.use(
         window.dispatchEvent(new CustomEvent('auth:session-expired'));
       }
 
-      // Solo si NO HAY RESPUESTA del servidor (servidor caído / sin red / timeout)
-      if (!error.response || error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') {
+      // Solo si NO HAY RESPUESTA del servidor en entorno local de pruebas (sin VITE_API_URL configurado)
+      const isProduction = import.meta.env.PROD || !!import.meta.env['VITE_API_URL'];
+      if (!isProduction && (!error.response || error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED')) {
         console.warn('⚠️ No se detectó servidor backend activo. Utilizando respuestas de respaldo con datos ficticios.');
         const mockRes = getMockResponse(error.config as InternalAxiosRequestConfig);
         if (mockRes) {
