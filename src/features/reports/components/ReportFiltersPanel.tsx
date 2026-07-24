@@ -8,7 +8,6 @@
  */
 
 import { useState } from 'react';
-import { ReportType } from '@/types';
 import type { ReportFilters } from '../hooks/useReportFilters';
 
 // ---------------------------------------------------------------------------
@@ -83,7 +82,7 @@ const FilterSection = ({
     <div className="border-b border-thistle-700 last:border-b-0">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((prev: boolean) => !prev)}
         className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold text-thistle-200 hover:bg-thistle-900 transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2">
