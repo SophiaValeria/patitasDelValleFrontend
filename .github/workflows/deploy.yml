@@ -1,4 +1,4 @@
-name: Desplegar en GitHub Pages
+name: Deploy Frontend
 
 on:
   push:
@@ -6,17 +6,22 @@ on:
       - main
   workflow_dispatch:
 
+# Permisos para GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: 'deploy'
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  # ─────────────────────────────────────────────
+  #  JOB 1: Deploy a GitHub Pages
+  # ─────────────────────────────────────────────
+  deploy-github-pages:
+    name: Deploy a GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -37,7 +42,7 @@ jobs:
       - name: Compilar aplicación estática
         env:
           GITHUB_PAGES: 'true'
-          VITE_API_URL: 'https://patitas-del-valle.demo/api/v1'
+          VITE_API_URL: 'https://patitasdelvallebackend-production.up.railway.app/api/v1'
         run: npm run build
 
       - name: Configurar GitHub Pages
@@ -51,3 +56,37 @@ jobs:
       - name: Desplegar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # ─────────────────────────────────────────────
+  #  JOB 2: Deploy a Vercel (Producción)
+  # ─────────────────────────────────────────────
+  deploy-vercel:
+    name: Deploy a Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Vercel CLI
+        run: npm install -g vercel
+
+      - name: Compilar y desplegar en Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: |
+          vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+          vercel build --prod --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
