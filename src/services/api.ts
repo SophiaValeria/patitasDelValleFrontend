@@ -67,16 +67,7 @@ const getMockResponse = (config: InternalAxiosRequestConfig): AxiosResponse | nu
       });
     }
 
-    // Usuario demo fallback si ingresó credenciales no exactas
-    const defaultUser = users[0];
-    localStorage.setItem(MOCK_USER_KEY, defaultUser._id);
-    return buildAxiosRes({
-      success: true,
-      data: {
-        user: defaultUser,
-        token: `mock-jwt-token-${defaultUser._id}`,
-      },
-    });
+    return null;
   }
 
   // 2. Auth Register
@@ -213,8 +204,8 @@ apiClient.interceptors.response.use(
         window.dispatchEvent(new CustomEvent('auth:session-expired'));
       }
 
-      // Si el servidor backend no responde (offline / GitHub Pages sin backend)
-      if (!error.response || error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED' || error.response.status >= 400) {
+      // Solo si NO HAY RESPUESTA del servidor (servidor caído / sin red / timeout)
+      if (!error.response || error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') {
         console.warn('⚠️ No se detectó servidor backend activo. Utilizando respuestas de respaldo con datos ficticios.');
         const mockRes = getMockResponse(error.config as InternalAxiosRequestConfig);
         if (mockRes) {
