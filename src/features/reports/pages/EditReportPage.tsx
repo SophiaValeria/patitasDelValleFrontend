@@ -28,12 +28,14 @@ const EditReportPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStatusWarningModal, setShowStatusWarningModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Campos editables
   const [type, setType] = useState<ReportType>(ReportType.LOST);
-  const [status, setStatus] = useState<ReportStatus>(ReportStatus.ACTIVE);
+  const [initialStatus, setInitialStatus] = useState<ReportStatus>(ReportStatus.PENDING_REVIEW);
+  const [status, setStatus] = useState<ReportStatus>(ReportStatus.PENDING_REVIEW);
   const [petName, setPetName] = useState("");
   const [species, setSpecies] = useState("Perro");
   const [breed, setBreed] = useState("");
@@ -62,7 +64,8 @@ const EditReportPage: React.FC = () => {
         if (res.data && res.data.success && res.data.data) {
           const rep = res.data.data;
           setType(rep.type || ReportType.LOST);
-          setStatus(rep.status || ReportStatus.ACTIVE);
+          setInitialStatus(rep.status || ReportStatus.PENDING_REVIEW);
+          setStatus(rep.status || ReportStatus.PENDING_REVIEW);
 
           const animal = rep.animalInfo || {};
           setPetName(animal.name || rep.petName || "");
@@ -156,32 +159,21 @@ const EditReportPage: React.FC = () => {
   };
 
   // Guardar Cambios
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const performSave = async (overrideStatus?: ReportStatus) => {
+    setIsSubmitting(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (images.length === 0) {
-      setImageError("Debes mantener al menos una foto de la mascota.");
-      return;
-    }
-
-    if (!region || !comuna || !address.trim()) {
-      setErrorMessage("Por favor completa la región, comuna y dirección.");
-      return;
-    }
-
-    if (!phone.trim()) {
-      setErrorMessage("Por favor ingresa un teléfono de contacto.");
-      return;
-    }
-
-    setIsSubmitting(true);
+    const finalStatus =
+      overrideStatus ||
+      (user?.role !== "ADMIN" && initialStatus === ReportStatus.ACTIVE
+        ? ReportStatus.PENDING_REVIEW
+        : status);
 
     try {
       const payload = {
         type,
-        status,
+        status: finalStatus,
         animalName: petName.trim(),
         species,
         breed: breed.trim() || "Mestizo",
@@ -217,6 +209,35 @@ const EditReportPage: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    if (images.length === 0) {
+      setImageError("Debes mantener al menos una foto de la mascota.");
+      return;
+    }
+
+    if (!region || !comuna || !address.trim()) {
+      setErrorMessage("Por favor completa la región, comuna y dirección.");
+      return;
+    }
+
+    if (!phone.trim()) {
+      setErrorMessage("Por favor ingresa un teléfono de contacto.");
+      return;
+    }
+
+    // Regla 5: Si el usuario (no admin) edita un reporte que está en estado activo, se debe advertir que volverá a revisión
+    if (user?.role !== "ADMIN" && initialStatus === ReportStatus.ACTIVE) {
+      setShowStatusWarningModal(true);
+      return;
+    }
+
+    performSave();
   };
 
   // Eliminar Reporte
@@ -357,22 +378,62 @@ const EditReportPage: React.FC = () => {
                   <label className="block text-xs font-bold text-thistle-300 mb-1.5 uppercase">
                     Estado de la publicación
                   </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as ReportStatus)}
-                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 outline-none focus:border-baby_pink-400 text-sm font-semibold cursor-pointer"
-                  >
-                    <option value={ReportStatus.ACTIVE}>
-                      🟢 Publicado / Activo (En búsqueda u oferta)
-                    </option>
-                    <option value={ReportStatus.RESOLVED}>
-                      🎉 Resuelto (Encontrado / Adoptado)
-                    </option>
-                    <option value={ReportStatus.PENDING_REVIEW}>
-                      ⏳ En Revisión
-                    </option>
-                    <option value={ReportStatus.DRAFT}>📝 Borrador</option>
-                  </select>
+                  {user?.role === "ADMIN" ? (
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as ReportStatus)}
+                      className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 outline-none focus:border-baby_pink-400 text-sm font-semibold cursor-pointer"
+                    >
+                      <option value={ReportStatus.ACTIVE}>
+                        🟢 Publicado / Activo
+                      </option>
+                      <option value={ReportStatus.PENDING_REVIEW}>
+                        ⏳ En Revisión
+                      </option>
+                      <option value={ReportStatus.REJECTED}>
+                        🔴 Rechazado
+                      </option>
+                      <option value={ReportStatus.DESISTED}>
+                        ⚪ Desistido
+                      </option>
+                      <option value={ReportStatus.RESOLVED}>
+                        🎉 Resuelto
+                      </option>
+                      <option value={ReportStatus.DRAFT}>📝 Borrador</option>
+                    </select>
+                  ) : initialStatus === ReportStatus.PENDING_REVIEW ? (
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value as ReportStatus)}
+                      className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 outline-none focus:border-baby_pink-400 text-sm font-semibold cursor-pointer"
+                    >
+                      <option value={ReportStatus.PENDING_REVIEW}>
+                        ⏳ En Revisión
+                      </option>
+                      <option value={ReportStatus.DESISTED}>
+                        ⚪ Desistido (Cancelar publicación)
+                      </option>
+                    </select>
+                  ) : (
+                    <div className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-950/60 text-thistle-200 text-sm font-semibold flex items-center justify-between">
+                      <span>
+                        {status === ReportStatus.ACTIVE
+                          ? "🟢 Activo"
+                          : status === ReportStatus.DESISTED
+                          ? "⚪ Desistido"
+                          : status === ReportStatus.REJECTED
+                          ? "🔴 Rechazado"
+                          : status === ReportStatus.RESOLVED
+                          ? "🎉 Resuelto"
+                          : "⏳ En Revisión"}
+                      </span>
+                      {initialStatus === ReportStatus.ACTIVE && (
+                        <span className="text-xs text-amber-400 font-medium">
+                          (Pasará a revisión al guardar)
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Selector de Tipo */}
@@ -707,6 +768,57 @@ const EditReportPage: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* ── MODAL DE ADVERTENCIA AL EDITAR REPORTE ACTIVO ── */}
+      {showStatusWarningModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-thistle-900 border border-thistle-600 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative animate-fade-in text-thistle-100">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-2xl mx-auto">
+              ⚠️
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-black text-white">
+                El reporte volverá a revisión
+              </h3>
+              <p className="text-xs text-thistle-200 font-medium leading-relaxed">
+                Este reporte se encuentra actualmente en estado{" "}
+                <strong className="text-emerald-400 font-bold">Activo</strong>. Al guardar los cambios, pasará automáticamente a estado{" "}
+                <strong className="text-sky_blue-300 font-bold">En revisión</strong> para ser validado por un administrador antes de volver a publicarse.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowStatusWarningModal(false)}
+                className="w-full py-3 rounded-2xl border-2 border-thistle-600 text-thistle-200 font-bold text-xs hover:bg-thistle-800 transition-all cursor-pointer min-h-[44px]"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowStatusWarningModal(false);
+                  performSave(ReportStatus.PENDING_REVIEW);
+                }}
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md transition-all cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Entendido, guardar cambios"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── MODAL DE CONFIRMACIÓN DE ELIMINACIÓN ── */}
       {showDeleteModal && (

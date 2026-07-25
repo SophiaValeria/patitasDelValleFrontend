@@ -111,3 +111,35 @@ export const formatImageUrl = (
   return `${backendOrigin}${cleanPath}`;
 };
 
+/**
+ * Traduce el estado del reporte a texto en español.
+ */
+export const formatStatus = (status?: string): string => {
+  if (!status) return 'En revisión';
+  const s = status.toUpperCase();
+  switch (s) {
+    case 'ACTIVE':
+    case 'ACTIVO':
+      return 'Activo';
+    case 'PENDING_REVIEW':
+    case 'PENDIENTE':
+    case 'REVISIÓN':
+    case 'REVISION':
+      return 'En revisión';
+    case 'REJECTED':
+    case 'RECHAZADO':
+      return 'Rechazado';
+    case 'DESISTED':
+    case 'DESISTIDO':
+      return 'Desistido';
+    case 'RESOLVED':
+    case 'RESUELTO':
+      return 'Resuelto';
+    case 'DRAFT':
+    case 'BORRADOR':
+      return 'Borrador';
+    default:
+      return status;
+  }
+};
+

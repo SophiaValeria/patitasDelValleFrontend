@@ -18,7 +18,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportType, ReportStatus } from '@/types';
-import { formatSpecies, formatSex, formatSize, formatImageUrl } from '@/utils/formatters';
+import { formatSpecies, formatSex, formatSize, formatImageUrl, formatStatus } from '@/utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Interfaz interna para el detalle del reporte
@@ -364,7 +364,7 @@ const ReportDetailPage: React.FC = () => {
                 <div className="bg-thistle-950/40 p-3.5 rounded-2xl border border-thistle-800">
                   <p className="text-[11px] font-bold text-thistle-400 uppercase">Estado</p>
                   <p className="text-sm font-bold text-thistle-100 mt-0.5">
-                    {report.status === ReportStatus.ACTIVE ? 'Publicado / Activo' : 'En proceso'}
+                    {formatStatus(report.status)}
                   </p>
                 </div>
               </div>

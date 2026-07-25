@@ -18,6 +18,8 @@ export enum ReportStatus {
   ACTIVE = 'ACTIVE',
   /** Rechazado — no cumple las políticas de la plataforma */
   REJECTED = 'REJECTED',
+  /** Desistido — cancelado por el usuario autor mientras estaba en revisión */
+  DESISTED = 'DESISTED',
   /** Resuelto — mascota encontrada / adoptada */
   RESOLVED = 'RESOLVED',
 }

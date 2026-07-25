@@ -311,6 +311,13 @@ const UserProfilePage: React.FC = () => {
             Rechazado
           </span>
         );
+      case ReportStatus.DESISTED:
+        return (
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950/80 text-amber-300 border border-amber-500/60 flex items-center gap-1.5 w-fit">
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            Desistido
+          </span>
+        );
       default:
         return (
           <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-thistle-900 text-thistle-300 border border-thistle-600 w-fit">
