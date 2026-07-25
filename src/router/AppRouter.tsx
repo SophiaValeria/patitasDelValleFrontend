@@ -28,48 +28,18 @@ import UserProfilePage from '@/features/user/pages/UserProfilePage';
 import UserDashboardPage from '@/features/user/pages/UserDashboardPage';
 import ReportDetailPage from '@/features/reports/pages/ReportDetailPage';
 import ReportListPage from '@/features/reports/pages/ReportListPage';
+import EditReportPage from '@/features/reports/pages/EditReportPage';
+import AdminReportReviewPage from '@/features/admin/pages/AdminReportReviewPage';
+import AdminUsersPage from '@/features/admin/pages/AdminUsersPage';
 
 // Públicas
 const NotFoundPage = () => <div data-testid="page-not-found">404 — Página no encontrada</div>;
 const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No autorizado</div>;
 
-import EditReportPage from '@/features/reports/pages/EditReportPage';
-
-// Administrativas
-const AdminDashboardPage = () => <div data-testid="page-admin-dashboard">AdminDashboardPage — Placeholder</div>;
-const AdminReportReviewPage = () => <div data-testid="page-admin-review">AdminReportReviewPage — Placeholder</div>;
-const AdminReportDetailPage = () => <div data-testid="page-admin-report-detail">AdminReportDetailPage — Placeholder</div>;
-
 // ---------------------------------------------------------------------------
 // AppRouter
 // ---------------------------------------------------------------------------
 
-/**
- * AppRouter
- *
- * Estructura de rutas:
- * ```
- * /                          → HomePage
- * /reportes                  → ReportListPage
- * /reportes/:id              → ReportDetailPage
- * /login                     → LoginPage
- * /registro                  → RegisterPage
- * /unauthorized              → UnauthorizedPage
- *
- * [Autenticado]
- * /dashboard                 → UserDashboardPage
- * /reportes/nuevo            → CreateReportPage
- * /reportes/:id/editar       → EditReportPage
- * /perfil                    → UserProfilePage
- *
- * [Admin]
- * /admin                     → AdminDashboardPage (redirect a /admin/reportes)
- * /admin/reportes            → AdminReportReviewPage
- * /admin/reportes/:id        → AdminReportDetailPage
- *
- * *                          → NotFoundPage (catch-all)
- * ```
- */
 import useAuth from '@/hooks/useAuth';
 
 const AppRouter = () => {
@@ -118,32 +88,25 @@ const AppRouter = () => {
             <Route path="/reportes/:id/editar" element={<EditReportPage />} />
             <Route path="/perfil" element={<UserProfilePage />} />
           </Route>
-        </Route>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* RUTAS ADMINISTRATIVAS — requieren rol ADMIN                       */}
-        {/* ---------------------------------------------------------------- */}
-        <Route
-          element={
-            <ProtectedRoute
-              isAuthenticated={isAuthenticated}
-              userRole={userRole}
-              requiredRole={UserRole.ADMIN}
-              redirectTo="/login"
+          {/* RUTAS ADMINISTRATIVAS — requieren rol ADMIN (con Header y Footer) */}
+          <Route
+            element={
+              <ProtectedRoute
+                isAuthenticated={isAuthenticated}
+                userRole={userRole}
+                requiredRole={UserRole.ADMIN}
+                redirectTo="/unauthorized"
+              />
+            }
+          >
+            <Route
+              path="/admin"
+              element={<Navigate to="/admin/reportes" replace />}
             />
-          }
-        >
-          {/* Redirige /admin → /admin/reportes como página principal */}
-          <Route
-            path="/admin"
-            element={<Navigate to="/admin/reportes" replace />}
-          />
-          <Route path="/admin/reportes" element={<AdminReportReviewPage />} />
-          <Route
-            path="/admin/reportes/:id"
-            element={<AdminReportDetailPage />}
-          />
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/reportes" element={<AdminReportReviewPage />} />
+            <Route path="/admin/usuarios" element={<AdminUsersPage />} />
+          </Route>
         </Route>
 
         {/* ---------------------------------------------------------------- */}
@@ -156,3 +119,4 @@ const AppRouter = () => {
 };
 
 export default AppRouter;
+

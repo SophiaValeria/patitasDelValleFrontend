@@ -12,7 +12,7 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -26,8 +26,6 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-
 
   const handleLogout = () => {
     logout();
@@ -63,8 +61,6 @@ const Header = () => {
               <span className="text-baby_pink-400 font-extrabold">del Valle</span>
             </span>
           </Link>
-
-
 
           {/* ── Actions Desktop ── */}
           <div className="hidden lg:flex items-center gap-3">
@@ -145,16 +141,29 @@ const Header = () => {
                       </Link>
 
                       {user.role === 'ADMIN' && (
-                        <Link
-                          to="/admin/reportes"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-baby_pink-300 hover:bg-thistle-900 transition-colors"
-                        >
-                          <svg className="w-4 h-4 text-baby_pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                          </svg>
-                          Panel Administrador
-                        </Link>
+                        <>
+                          <Link
+                            to="/admin/reportes"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-baby_pink-300 hover:bg-thistle-900 transition-colors"
+                          >
+                            <svg className="w-4 h-4 text-baby_pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Gestión de Reportes
+                          </Link>
+
+                          <Link
+                            to="/admin/usuarios"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-sky_blue-300 hover:bg-thistle-900 transition-colors"
+                          >
+                            <svg className="w-4 h-4 text-sky_blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            Gestión de Usuarios
+                          </Link>
+                        </>
                       )}
                     </div>
 
@@ -214,7 +223,7 @@ const Header = () => {
       {menuOpen && (
         <div className="lg:hidden bg-white border-t border-thistle-700 shadow-lg animate-in slide-in-from-top duration-200">
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-2">
-            
+
             {/* Si está autenticado, mostrar tarjeta de usuario en mobile */}
             {isAuthenticated && user && (
               <div className="p-3 bg-thistle-900/60 rounded-2xl border border-thistle-600 mb-2 flex items-center gap-3">
@@ -227,8 +236,6 @@ const Header = () => {
                 </div>
               </div>
             )}
-
-
 
             <div className="border-t border-thistle-700 mt-2 pt-3 flex flex-col gap-2">
               <button
@@ -256,6 +263,25 @@ const Header = () => {
                   >
                     Mis Reportes
                   </Link>
+
+                  {user?.role === 'ADMIN' && (
+                    <>
+                      <Link
+                        to="/admin/reportes"
+                        onClick={() => setMenuOpen(false)}
+                        className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-baby_pink-950 text-baby_pink-300 border border-baby_pink-500/50 hover:bg-baby_pink-900 transition-all min-h-[44px] flex items-center justify-center gap-2"
+                      >
+                        🛡️ Gestión de Reportes
+                      </Link>
+                      <Link
+                        to="/admin/usuarios"
+                        onClick={() => setMenuOpen(false)}
+                        className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-sky_blue-950 text-sky_blue-300 border border-sky_blue-500/50 hover:bg-sky_blue-900 transition-all min-h-[44px] flex items-center justify-center gap-2"
+                      >
+                        👥 Gestión de Usuarios
+                      </Link>
+                    </>
+                  )}
 
                   <button
                     onClick={handleLogout}
@@ -289,4 +315,3 @@ const Header = () => {
 };
 
 export default Header;
-

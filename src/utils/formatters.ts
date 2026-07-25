@@ -143,3 +143,19 @@ export const formatStatus = (status?: string): string => {
   }
 };
 
+/**
+ * Formatea un RUT chileno agregando puntos y guión (ej: 12.345.678-K).
+ */
+export const formatRut = (rut?: string): string => {
+  if (!rut) return '';
+  const cleaned = rut.replace(/[^0-9kK]/g, '');
+  if (cleaned.length < 2) return cleaned.toUpperCase();
+
+  const body = cleaned.slice(0, -1);
+  const dv = cleaned.slice(-1).toUpperCase();
+
+  const formattedBody = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${formattedBody}-${dv}`;
+};
+
+
