@@ -40,11 +40,11 @@ const COMUNAS_RM = [
 ];
 
 const SPECIES_OPTIONS = [
-  { label: 'Perro', emoji: '🐶', value: 'Perro' },
-  { label: 'Gato', emoji: '🐱', value: 'Gato' },
-  { label: 'Ave', emoji: '🐦', value: 'Ave' },
-  { label: 'Conejo', emoji: '🐰', value: 'Conejo' },
-  { label: 'Otro', emoji: '🐾', value: 'Otro' },
+  { label: 'Perro', emoji: '🐶', value: 'DOG' },
+  { label: 'Gato', emoji: '🐱', value: 'CAT' },
+  { label: 'Ave', emoji: '🐦', value: 'BIRD' },
+  { label: 'Conejo', emoji: '🐰', value: 'RABBIT' },
+  { label: 'Otro', emoji: '🐾', value: 'OTHER' },
 ];
 
 const SIZE_OPTIONS = [

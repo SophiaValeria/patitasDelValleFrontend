@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportStatus, ReportType, UserRole } from '@/types';
+import { formatSpecies, formatImageUrl } from '@/utils/formatters';
 
 interface UserReport {
   id: string;
@@ -20,6 +21,7 @@ interface UserReport {
   location: string;
   image: string;
 }
+
 
 // Datos iniciales de demostración para el usuario
 const MOCK_USER_REPORTS: UserReport[] = [
@@ -92,12 +94,14 @@ const UserProfilePage: React.FC = () => {
         id: raw._id || raw.id || String(Math.random()),
         type: raw.type || ReportType.LOST,
         petName: raw.animalInfo?.name || raw.petName || 'Sin Nombre',
-        species: raw.animalInfo?.species || raw.species || 'Mascota',
+        species: formatSpecies(raw.animalInfo?.species || raw.species),
         breed: raw.animalInfo?.breed || raw.breed,
         status: raw.status || ReportStatus.ACTIVE,
         date: formatDate(raw.createdAt || raw.date),
         location: formatLocation(raw.location),
-        image: (Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image) || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80',
+        image: formatImageUrl(
+          Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image
+        ),
       };
     };
 

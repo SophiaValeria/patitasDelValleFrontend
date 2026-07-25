@@ -17,7 +17,13 @@ interface Step2PetInfoProps {
 // Datos de referencia
 // ---------------------------------------------------------------------------
 
-const SPECIES = ['Perro', 'Gato', 'Ave', 'Conejo', 'Hamster', 'Tortuga', 'Otro'];
+const SPECIES = [
+  { value: 'DOG', label: 'Perro' },
+  { value: 'CAT', label: 'Gato' },
+  { value: 'BIRD', label: 'Ave' },
+  { value: 'RABBIT', label: 'Conejo' },
+  { value: 'OTHER', label: 'Otro' },
+];
 
 const SEX_OPTIONS: { value: PetSex; label: string; emoji: string }[] = [
   { value: 'MALE', label: 'Macho', emoji: '♂️' },
@@ -126,7 +132,7 @@ const Step2PetInfo = ({ data, onChange }: Step2PetInfoProps) => {
           >
             <option value="">Selecciona una especie</option>
             {SPECIES.map((s) => (
-              <option key={s} value={s}>{s}</option>
+              <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
         </div>

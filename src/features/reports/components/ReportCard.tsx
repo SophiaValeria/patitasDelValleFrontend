@@ -6,6 +6,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { ReportType } from '@/types';
+import { formatSpecies, formatSize, formatImageUrl } from '@/utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -83,15 +84,15 @@ export const normalizeReport = (raw: any): ReportCardData => ({
   id: raw._id || raw.id || String(Math.random()),
   type: raw.type || ReportType.LOST,
   petName: raw.animalInfo?.name || raw.petName || 'Sin Nombre',
-  species: raw.animalInfo?.species || raw.species || 'Mascota',
+  species: formatSpecies(raw.animalInfo?.species || raw.species),
   breed: raw.animalInfo?.breed || raw.breed || '',
   color: raw.animalInfo?.color || raw.color || '',
-  size: raw.animalInfo?.size || raw.size || '',
+  size: formatSize(raw.animalInfo?.size || raw.size),
   location: formatLocation(raw.location),
   date: formatDate(raw.updatedAt || raw.createdAt || raw.date),
-  image:
-    (Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image) ||
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80',
+  image: formatImageUrl(
+    Array.isArray(raw.images) && raw.images.length > 0 ? raw.images[0] : raw.image
+  ),
 });
 
 // ---------------------------------------------------------------------------

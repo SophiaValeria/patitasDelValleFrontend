@@ -8,6 +8,7 @@ import React from 'react';
 import type { ReportFormData } from '../../types/form.types';
 import { REPORT_TYPE_CONFIGS } from '../../types/form.types';
 import { ReportType } from '@/types';
+import { formatSpecies } from '@/utils/formatters';
 
 interface Step4ExtraProps {
   data: ReportFormData;
@@ -155,7 +156,7 @@ const Step4Extra = ({ data, onChange, onSubmit, isSubmitting }: Step4ExtraProps)
 
           {/* Datos */}
           <SummaryRow label="Nombre" value={data.animalName || 'Sin nombre'} />
-          <SummaryRow label="Especie" value={data.species} />
+          <SummaryRow label="Especie" value={formatSpecies(data.species)} />
           <SummaryRow label="Raza" value={data.breed || 'Desconocida'} />
           <SummaryRow label="Sexo" value={SEX_LABELS[data.sex]} />
           <SummaryRow label="Tamaño" value={SIZE_LABELS[data.size]} />

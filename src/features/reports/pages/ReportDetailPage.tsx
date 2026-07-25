@@ -18,6 +18,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportType, ReportStatus } from '@/types';
+import { formatSpecies, formatSex, formatSize, formatImageUrl } from '@/utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Interfaz interna para el detalle del reporte
@@ -27,6 +28,24 @@ interface DetailedReport {
   id: string;
   type: ReportType;
   status: ReportStatus;
+  petName: string;
+  species: string;
+  breed: string;
+  color: string;
+  sex: string;
+  size: string;
+  distinctFeatures: string;
+  region: string;
+  comuna: string;
+  address: string;
+  phone: string;
+  authorName: string;
+  authorEmail?: string;
+  authorAvatar?: string;
+  images: string[];
+  createdAt: string;
+}
+
   petName: string;
   species: string;
   breed: string;
@@ -128,11 +147,11 @@ const ReportDetailPage: React.FC = () => {
             type: raw.type || ReportType.LOST,
             status: raw.status || ReportStatus.ACTIVE,
             petName: raw.animalInfo?.name || raw.petName || 'Sin Nombre',
-            species: raw.animalInfo?.species || raw.species || 'No especificada',
+            species: formatSpecies(raw.animalInfo?.species || raw.species),
             breed: raw.animalInfo?.breed || raw.breed || 'Mestizo',
             color: raw.animalInfo?.color || raw.color || 'No especificado',
-            sex: raw.animalInfo?.sex || raw.sex || 'No especificado',
-            size: raw.animalInfo?.size || raw.size || 'Mediano',
+            sex: formatSex(raw.animalInfo?.sex || raw.sex),
+            size: formatSize(raw.animalInfo?.size || raw.size),
             distinctFeatures: raw.animalInfo?.distinctFeatures || raw.distinctFeatures || raw.additionalInfo || 'Sin características adicionales registradas.',
             region: typeof raw.location === 'object' ? raw.location?.region || '' : '',
             comuna: typeof raw.location === 'object' ? raw.location?.comuna || '' : '',
@@ -140,10 +159,10 @@ const ReportDetailPage: React.FC = () => {
             phone: raw.contact?.phone || raw.phone || 'No especificado',
             authorName: raw.author?.name || 'Usuario registrado',
             authorEmail: raw.author?.email,
-            authorAvatar: raw.author?.avatarUrl,
+            authorAvatar: formatImageUrl(raw.author?.avatarUrl),
             images: Array.isArray(raw.images) && raw.images.length > 0
-              ? raw.images
-              : [raw.image || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80'],
+              ? raw.images.map((img: string) => formatImageUrl(img))
+              : [formatImageUrl(raw.image, 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80')],
             createdAt: raw.createdAt
               ? new Date(raw.createdAt).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' })
               : 'Fecha reciente',

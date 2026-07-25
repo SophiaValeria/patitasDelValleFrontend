@@ -220,7 +220,14 @@ const ReportFormWizard = ({ reportType, onBack }: ReportFormWizardProps) => {
       setIsSubmitting(true);
       setValidationError(null);
 
-      const res = await apiClient.post('/reports', formData);
+      // Separar los File objetos (images) de las cadenas Base64 (imagePreviews)
+      const { images: _files, imagePreviews, ...restData } = formData;
+      const payload = {
+        ...restData,
+        images: imagePreviews && imagePreviews.length > 0 ? imagePreviews : [],
+      };
+
+      const res = await apiClient.post('/reports', payload);
 
       if (res.data && res.data.success) {
         setSubmitted(true);
