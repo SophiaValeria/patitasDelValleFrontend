@@ -192,3 +192,15 @@ export interface RegisterPayload {
   commune: string;
   avatarUrl?: string;
 }
+
+/** Payload para actualización de perfil */
+export interface UpdateProfilePayload {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  region?: string;
+  commune?: string;
+  avatarUrl?: string;
+}
+

@@ -9,6 +9,7 @@ import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportStatus, ReportType, UserRole } from '@/types';
 import { formatSpecies, formatImageUrl } from '@/utils/formatters';
+import { CHILE_REGIONS } from '@/features/reports/data/chile-locations';
 
 interface UserReport {
   id: string;
@@ -60,12 +61,133 @@ const MOCK_USER_REPORTS: UserReport[] = [
 ];
 
 const UserProfilePage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<'ALL' | ReportStatus>('ALL');
   const [reports, setReports] = useState<UserReport[]>(MOCK_USER_REPORTS);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
+
+  // Estados para el Modal de Edición de Perfil
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editRegion, setEditRegion] = useState('');
+  const [editCommune, setEditCommune] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [editAvatarUrl, setEditAvatarUrl] = useState<string | null>(null);
+
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
+  // Abrir Modal de Edición pre-poblando datos del usuario
+  const handleOpenEditModal = () => {
+    if (!user) return;
+    setEditName(user.name || '');
+    setEditEmail(user.email || '');
+    setEditPhone(user.phone || '');
+    setEditRegion(user.region || '');
+    setEditCommune(user.commune || '');
+    setEditAddress(user.address || '');
+    setEditAvatarUrl(user.avatarUrl || null);
+    setEditError(null);
+    setEditSuccess(null);
+    setAvatarError(null);
+    setIsEditModalOpen(true);
+  };
+
+  // Procesar archivo de imagen para foto de perfil
+  const processAvatarFile = (file: File) => {
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      setAvatarError('Por favor selecciona una imagen válida (JPEG, PNG, WEBP, GIF).');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError('La imagen de perfil no debe superar los 2 MB.');
+      return;
+    }
+
+    setAvatarError(null);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setEditAvatarUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processAvatarFile(e.target.files[0]);
+    }
+  };
+
+  const handleAvatarDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processAvatarFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  // Guardar Cambios de Perfil
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditError(null);
+    setEditSuccess(null);
+
+    if (
+      !editName.trim() ||
+      !editEmail.trim() ||
+      !editPhone.trim() ||
+      !editRegion ||
+      !editCommune ||
+      !editAddress.trim()
+    ) {
+      setEditError('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+
+    const phoneCleaned = editPhone.replace(/\s+/g, '');
+    if (!/^\+?(\d{8,12})$/.test(phoneCleaned)) {
+      setEditError('Por favor ingresa un número de celular válido (ej: +56912345678 o 912345678).');
+      return;
+    }
+
+    setIsUpdating(true);
+
+    try {
+      await updateProfile({
+        name: editName.trim(),
+        email: editEmail.trim(),
+        phone: phoneCleaned,
+        region: editRegion,
+        commune: editCommune,
+        address: editAddress.trim(),
+        avatarUrl: editAvatarUrl || '',
+      });
+
+      setEditSuccess('¡Perfil actualizado exitosamente!');
+      setTimeout(() => {
+        setIsEditModalOpen(false);
+        setEditSuccess(null);
+      }, 1200);
+    } catch (err: any) {
+      setEditError(err.message || 'Ocurrió un error al actualizar el perfil.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Objeto de región seleccionada para comunas dinámicas
+  const selectedEditRegionData = CHILE_REGIONS.find((r) => r.value === editRegion);
+
 
   // Intentar cargar reportes desde la API si la ruta está disponible
   useEffect(() => {
@@ -270,6 +392,16 @@ const UserProfilePage: React.FC = () => {
 
               {/* Botón Acción Principal */}
               <div className="flex items-center gap-3 w-full sm:w-auto">
+                <button
+                  onClick={handleOpenEditModal}
+                  className="w-full sm:w-auto px-4 py-3 rounded-2xl border-2 border-thistle-600 text-thistle-100 hover:border-baby_pink-400 hover:text-baby_pink-400 font-bold text-sm transition-all duration-200 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar Perfil
+                </button>
+
                 <button
                   onClick={() => navigate('/reportes/nuevo')}
                   className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-baby_pink-400 to-pastel_petal-400 text-white font-bold text-sm shadow-md hover:shadow-lg hover:from-baby_pink-300 hover:to-pastel_petal-300 transition-all duration-200 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
@@ -497,8 +629,264 @@ const UserProfilePage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* ── MODAL EDICIÓN DE PERFIL ── */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-thistle-700/60 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative my-8 animate-fade-in">
+            
+            {/* Header del Modal */}
+            <div className="flex items-center justify-between border-b border-thistle-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-baby_pink-400 to-thistle-400 flex items-center justify-center text-white text-lg font-black shadow-sm">
+                  ✏️
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-thistle-100">Editar Datos Personales</h2>
+                  <p className="text-xs text-thistle-300 font-medium">Actualiza tu información de contacto y residencia.</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsEditModalOpen(false)}
+                className="w-9 h-9 rounded-xl border border-thistle-700 text-thistle-300 hover:bg-thistle-800 flex items-center justify-center transition-all cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Mensajes Alerta Exito / Error */}
+            {editSuccess && (
+              <div className="bg-emerald-950/80 border border-emerald-500 rounded-2xl p-4 flex items-center gap-3 text-emerald-200 text-sm font-bold">
+                <span>✓</span> {editSuccess}
+              </div>
+            )}
+
+            {editError && (
+              <div className="bg-pastel_petal-900 border border-pastel_petal-300 rounded-2xl p-4 flex items-center gap-3 text-pastel_petal-100 text-sm font-bold">
+                <span>⚠️</span> {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              
+              {/* Sección Foto de Perfil */}
+              <div className="flex flex-col items-center justify-center space-y-3 bg-thistle-950/40 p-4 rounded-2xl border border-thistle-800">
+                <label className="text-xs font-bold text-thistle-200 uppercase tracking-wider">
+                  Foto de Perfil
+                </label>
+
+                <div className="relative group">
+                  {editAvatarUrl ? (
+                    <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-baby_pink-400 shadow-md">
+                      <img
+                        src={editAvatarUrl}
+                        alt="Vista previa perfil"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setEditAvatarUrl(null)}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-white text-xs font-bold cursor-pointer"
+                      >
+                        Eliminar foto
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={handleAvatarDrop}
+                      onClick={() => document.getElementById('edit-avatar-upload')?.click()}
+                      className="w-28 h-28 rounded-full border-4 border-dashed border-thistle-600 bg-thistle-900 hover:border-baby_pink-400 hover:bg-thistle-800 transition-all duration-200 flex flex-col items-center justify-center cursor-pointer text-center p-2 group"
+                    >
+                      <svg className="w-7 h-7 text-thistle-400 group-hover:text-baby_pink-400 transition-colors duration-200 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="text-[10px] font-semibold text-thistle-400 group-hover:text-baby_pink-400">
+                        Subir foto
+                      </span>
+                    </div>
+                  )}
+
+                  <input
+                    id="edit-avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarFileChange}
+                    className="hidden"
+                  />
+                </div>
+
+                <p className="text-[11px] text-thistle-400 text-center">
+                  Formatos permitidos: JPEG, PNG, WEBP (máx. 2MB).
+                </p>
+
+                {avatarError && (
+                  <p className="text-xs text-pastel_petal-200 font-medium">{avatarError}</p>
+                )}
+              </div>
+
+              {/* Grid de Formulario */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* Nombre */}
+                <div>
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Nombre Completo <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 placeholder-thistle-400 outline-none transition-all focus:border-baby_pink-400 text-sm"
+                  />
+                </div>
+
+                {/* RUT (CAMPO BLOQUEADO - NO EDITABLE) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-thistle-200 uppercase">
+                      RUT
+                    </label>
+                    <span className="text-[10px] font-bold text-thistle-400 flex items-center gap-1 bg-thistle-800/60 px-2 py-0.5 rounded-full border border-thistle-700">
+                      🔒 No editable
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    disabled
+                    readOnly
+                    value={user.rut || ''}
+                    title="El RUT no se puede modificar por motivos de seguridad e identidad."
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-800 bg-thistle-950/80 text-thistle-400 outline-none text-sm cursor-not-allowed font-semibold shadow-inner"
+                  />
+                </div>
+
+                {/* Celular */}
+                <div>
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Teléfono Celular <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="Ej: +56912345678"
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 placeholder-thistle-400 outline-none transition-all focus:border-baby_pink-400 text-sm"
+                  />
+                </div>
+
+                {/* Correo Electrónico */}
+                <div>
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Correo Electrónico <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 placeholder-thistle-400 outline-none transition-all focus:border-baby_pink-400 text-sm"
+                  />
+                </div>
+
+                {/* Región */}
+                <div>
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Región <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <select
+                    required
+                    value={editRegion}
+                    onChange={(e) => {
+                      setEditRegion(e.target.value);
+                      setEditCommune('');
+                    }}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 outline-none transition-all focus:border-baby_pink-400 text-sm cursor-pointer"
+                  >
+                    <option value="" className="bg-thistle-900">Selecciona una región</option>
+                    {CHILE_REGIONS.map((r) => (
+                      <option key={r.value} value={r.value} className="bg-thistle-900">
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Comuna */}
+                <div>
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Comuna <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <select
+                    required
+                    disabled={!editRegion}
+                    value={editCommune}
+                    onChange={(e) => setEditCommune(e.target.value)}
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 outline-none transition-all focus:border-baby_pink-400 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="" className="bg-thistle-900">Selecciona una comuna</option>
+                    {selectedEditRegionData?.comunas.map((c) => (
+                      <option key={c} value={c} className="bg-thistle-900">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Dirección */}
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-thistle-200 mb-1.5 uppercase">
+                    Dirección Completa <span className="text-baby_pink-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    placeholder="Calle, número, villa o departamento"
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-2xl border-2 border-thistle-600 bg-thistle-900 text-thistle-100 placeholder-thistle-400 outline-none transition-all focus:border-baby_pink-400 text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Footer Acciones Modal */}
+              <div className="pt-4 border-t border-thistle-800 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isUpdating}
+                  className="px-5 py-2.5 rounded-2xl border-2 border-thistle-700 text-thistle-300 hover:bg-thistle-800 font-semibold text-xs transition-all cursor-pointer min-h-[44px]"
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-baby_pink-400 to-pastel_petal-400 text-white font-bold text-xs shadow-md hover:from-baby_pink-300 hover:to-pastel_petal-300 transition-all cursor-pointer min-h-[44px] flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isUpdating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Guardando...</span>
+                    </>
+                  ) : (
+                    <span>Guardar Cambios</span>
+                  )}
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserProfilePage;
+

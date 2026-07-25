@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import apiClient, { setToken, clearToken, getToken } from '../services/api';
-import type { User, LoginPayload, RegisterPayload, ApiResponse, AuthResponse } from '../types';
+import type { User, LoginPayload, RegisterPayload, UpdateProfilePayload, ApiResponse, AuthResponse } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  updateProfile: (payload: UpdateProfilePayload) => Promise<User>;
   logout: () => void;
 }
 
@@ -113,6 +114,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (payload: UpdateProfilePayload): Promise<User> => {
+    setIsLoading(true);
+    try {
+      const response = await apiClient.put<ApiResponse<User>>('/auth/me', payload);
+      if (response.data.success) {
+        const updatedUser = response.data.data;
+        setUser(updatedUser);
+        return updatedUser;
+      } else {
+        throw new Error(response.data.message || 'Error al actualizar el perfil.');
+      }
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || error.message || 'Error al actualizar el perfil.';
+      throw new Error(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     handleClearAuth();
   };
@@ -126,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         register,
+        updateProfile,
         logout,
       }}
     >
@@ -133,3 +154,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
