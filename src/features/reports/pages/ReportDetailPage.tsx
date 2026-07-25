@@ -254,16 +254,30 @@ const ReportDetailPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-thistle-900 via-thistle-900 to-icy_blue-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
 
-        {/* ── BOTÓN NAVEGACIÓN ATRÁS ── */}
-        <button
-          onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-thistle-300 hover:text-white transition-colors cursor-pointer py-1"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Volver
-        </button>
+        {/* ── BOTÓN NAVEGACIÓN ATRÁS Y EDITAR ── */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-thistle-300 hover:text-white transition-colors cursor-pointer py-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver
+          </button>
+
+          {isAuthenticated && (
+            <button
+              onClick={() => navigate(`/reportes/${report.id}/editar`)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-baby_pink-400 to-pastel_petal-400 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer min-h-[40px]"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Editar este Reporte
+            </button>
+          )}
+        </div>
 
         {/* ── GRID PRINCIPAL: FOTOS Y DETALLES ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

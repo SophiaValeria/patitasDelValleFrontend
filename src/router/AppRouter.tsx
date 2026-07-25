@@ -33,8 +33,7 @@ import ReportListPage from '@/features/reports/pages/ReportListPage';
 const NotFoundPage = () => <div data-testid="page-not-found">404 — Página no encontrada</div>;
 const UnauthorizedPage = () => <div data-testid="page-unauthorized">403 — No autorizado</div>;
 
-// Privadas (usuario autenticado)
-const EditReportPage = () => <div data-testid="page-edit-report">EditReportPage — Placeholder</div>;
+import EditReportPage from '@/features/reports/pages/EditReportPage';
 
 // Administrativas
 const AdminDashboardPage = () => <div data-testid="page-admin-dashboard">AdminDashboardPage — Placeholder</div>;

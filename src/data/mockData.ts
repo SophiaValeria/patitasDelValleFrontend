@@ -824,3 +824,55 @@ export const saveMockUser = (user: Partial<MockUser>): MockUser => {
   localStorage.setItem(LOCAL_STORAGE_USERS_KEY, JSON.stringify(updatedList));
   return newUser;
 };
+
+/** Actualiza un reporte ficticio existente en localStorage */
+export const updateMockReport = (reportId: string, updatedData: any): MockReportItem | null => {
+  const reports = getStoredMockReports();
+  const index = reports.findIndex((r) => r._id === reportId);
+  if (index === -1) return null;
+
+  const existing = reports[index];
+  const updated: MockReportItem = {
+    ...existing,
+    type: updatedData.type || existing.type,
+    status: updatedData.status || existing.status,
+    animalInfo: {
+      ...existing.animalInfo,
+      name: updatedData.animalInfo?.name || updatedData.animalName || updatedData.petName || existing.animalInfo.name,
+      species: updatedData.animalInfo?.species || updatedData.species || existing.animalInfo.species,
+      breed: updatedData.animalInfo?.breed || updatedData.breed || existing.animalInfo.breed,
+      color: updatedData.animalInfo?.color || updatedData.color || (Array.isArray(updatedData.colors) ? updatedData.colors.join(', ') : existing.animalInfo.color),
+      sex: updatedData.animalInfo?.sex || updatedData.sex || existing.animalInfo.sex,
+      size: updatedData.animalInfo?.size || updatedData.size || existing.animalInfo.size,
+      distinctFeatures: updatedData.animalInfo?.distinctFeatures || updatedData.characteristics || updatedData.distinctFeatures || existing.animalInfo.distinctFeatures,
+    },
+    location: {
+      ...existing.location,
+      region: updatedData.location?.region || updatedData.regionLabel || updatedData.region || existing.location.region,
+      comuna: updatedData.location?.comuna || updatedData.comuna || existing.location.comuna,
+      address: updatedData.location?.address || updatedData.address || existing.location.address,
+    },
+    contact: {
+      ...existing.contact,
+      phone: updatedData.contact?.phone || updatedData.phone || existing.contact.phone,
+    },
+    images: Array.isArray(updatedData.images) && updatedData.images.length > 0
+      ? updatedData.images
+      : (Array.isArray(updatedData.imagePreviews) && updatedData.imagePreviews.length > 0 ? updatedData.imagePreviews : existing.images),
+    updatedAt: new Date().toISOString(),
+  };
+
+  reports[index] = updated;
+  localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(reports));
+  return updated;
+};
+
+/** Elimina un reporte ficticio en localStorage */
+export const deleteMockReport = (reportId: string): boolean => {
+  const reports = getStoredMockReports();
+  const filtered = reports.filter((r) => r._id !== reportId);
+  if (filtered.length === reports.length) return false;
+  localStorage.setItem(LOCAL_STORAGE_REPORTS_KEY, JSON.stringify(filtered));
+  return true;
+};
+

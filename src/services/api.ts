@@ -18,6 +18,8 @@ import {
   getStoredMockReports,
   saveMockReport,
   saveMockUser,
+  updateMockReport,
+  deleteMockReport,
 } from '@/data/mockData';
 
 // ---------------------------------------------------------------------------
@@ -149,6 +151,28 @@ const getMockResponse = (config: InternalAxiosRequestConfig): AxiosResponse | nu
     return buildAxiosRes({
       success: true,
       data: created,
+    });
+  }
+
+  // 8. Reportes - Actualizar Reporte
+  if (url.match(/\/reports\/[a-zA-Z0-9_-]+$/) && method === 'put') {
+    const reportId = url.split('/').pop() || '';
+    const body = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+    const updated = updateMockReport(reportId, body);
+    return buildAxiosRes({
+      success: true,
+      message: 'Reporte actualizado exitosamente.',
+      data: updated,
+    });
+  }
+
+  // 9. Reportes - Eliminar Reporte
+  if (url.match(/\/reports\/[a-zA-Z0-9_-]+$/) && method === 'delete') {
+    const reportId = url.split('/').pop() || '';
+    deleteMockReport(reportId);
+    return buildAxiosRes({
+      success: true,
+      message: 'Reporte eliminado exitosamente.',
     });
   }
 
