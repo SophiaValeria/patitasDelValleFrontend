@@ -235,7 +235,7 @@ const AdminUsersPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-thistle-800/60">
                     {filteredUsers.map((u) => (
-                      <tr key={u.id || u.email} className="hover:bg-thistle-900/40 transition-colors">
+                      <tr key={u._id || u.email} className="hover:bg-thistle-900/40 transition-colors">
                         {/* Usuario */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -304,7 +304,7 @@ const AdminUsersPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:hidden">
                 {filteredUsers.map((u) => (
                   <div
-                    key={u.id || u.email}
+                    key={u._id || u.email}
                     className="bg-thistle-950/40 border border-thistle-700/60 p-5 rounded-2xl space-y-4 hover:border-thistle-400 transition-all shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">

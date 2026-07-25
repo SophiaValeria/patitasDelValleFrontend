@@ -161,6 +161,8 @@ const AdminReportReviewPage: React.FC = () => {
             Resuelto
           </span>
         );
+      default:
+        return null;
     }
   };
 
@@ -184,6 +186,8 @@ const AdminReportReviewPage: React.FC = () => {
             Adopción
           </span>
         );
+      default:
+        return null;
     }
   };
 
