@@ -46,23 +46,6 @@ interface DetailedReport {
   createdAt: string;
 }
 
-  petName: string;
-  species: string;
-  breed: string;
-  color: string;
-  sex: string;
-  size: string;
-  distinctFeatures: string;
-  region: string;
-  comuna: string;
-  address: string;
-  phone: string;
-  authorName: string;
-  authorEmail?: string;
-  authorAvatar?: string;
-  images: string[];
-  createdAt: string;
-}
 
 // ---------------------------------------------------------------------------
 // Datos de respaldo / Mock por si se accede a un ID local de demostración
