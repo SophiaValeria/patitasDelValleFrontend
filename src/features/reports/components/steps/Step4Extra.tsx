@@ -160,7 +160,7 @@ const Step4Extra = ({ data, onChange, onSubmit, isSubmitting }: Step4ExtraProps)
           <SummaryRow label="Raza" value={data.breed || 'Desconocida'} />
           <SummaryRow label="Sexo" value={SEX_LABELS[data.sex]} />
           <SummaryRow label="Tamaño" value={SIZE_LABELS[data.size]} />
-          <SummaryRow label="Color(es)" value={data.colors} />
+          <SummaryRow label="Color" value={data.color} />
           <SummaryRow label="Características" value={data.characteristics} />
           <SummaryRow label="Identificativos" value={data.identifiers} />
           <SummaryRow label="Región" value={data.regionLabel} />

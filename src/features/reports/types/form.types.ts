@@ -30,7 +30,7 @@ export interface ReportFormData {
   breed: string;
   sex: PetSex;
   size: PetSize;
-  colors: string[];
+  color: string;
   characteristics: string;
   identifiers: string[];
 
@@ -58,7 +58,7 @@ export const INITIAL_FORM_DATA: Omit<ReportFormData, 'type'> = {
   breed: '',
   sex: 'UNKNOWN',
   size: 'MEDIUM',
-  colors: [],
+  color: '',
   characteristics: '',
   identifiers: [],
   region: '',

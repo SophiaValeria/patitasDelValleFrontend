@@ -182,18 +182,18 @@ const HomePage = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-icy_blue-800 opacity-20 blur-3xl pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5 mb-6 text-sm font-medium text-thistle-100">
+          <div className="inline-flex items-center gap-2 bg-thistle-100/10 backdrop-blur-sm border border-thistle-100/20 rounded-full px-4 py-1.5 mb-6 text-sm font-semibold text-thistle-100">
             🐾 Plataforma de mascotas en Chile
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-thistle-100 leading-tight mb-4">
             Reunimos mascotas con{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-baby_pink-400 to-pastel_petal-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-baby_pink-300 to-pastel_petal-300">
               sus familias
             </span>
           </h1>
 
-          <p className="text-thistle-600 text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-thistle-200 text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
             Reporta una mascota perdida, encontrada o publica una en adopción.
             Juntos construimos la red de ayuda animal más grande de Chile.
           </p>

@@ -37,11 +37,6 @@ const SIZE_OPTIONS: { value: PetSize; label: string; desc: string; emoji: string
   { value: 'LARGE', label: 'Grande', desc: 'Más de 20 kg', emoji: '🦮' },
 ];
 
-const COLOR_OPTIONS = [
-  'Blanco', 'Negro', 'Café', 'Dorado', 'Crema', 'Gris',
-  'Atigrado', 'Tricolor', 'Blanco y Negro', 'Naranja', 'Rojo', 'Otro',
-];
-
 const IDENTIFIER_OPTIONS = [
   { value: 'collar', label: 'Collar / Placa', emoji: '🏷️' },
   { value: 'microchip', label: 'Microchip', emoji: '📡' },
@@ -68,12 +63,6 @@ const inputClass =
 // ---------------------------------------------------------------------------
 
 const Step2PetInfo = ({ data, onChange }: Step2PetInfoProps) => {
-  const toggleColor = (color: string) => {
-    const updated = data.colors.includes(color)
-      ? data.colors.filter((c) => c !== color)
-      : [...data.colors, color];
-    onChange({ colors: updated });
-  };
 
   const toggleIdentifier = (id: string) => {
     if (id === 'none') {
@@ -201,33 +190,20 @@ const Step2PetInfo = ({ data, onChange }: Step2PetInfoProps) => {
         </div>
       </div>
 
-      {/* Colores */}
+      {/* Color del pelaje */}
       <div>
-        <FieldLabel required>
-          Color(es) del pelaje{' '}
-          <span className="font-normal text-thistle-500 text-xs">(selecciona todos los que apliquen)</span>
-        </FieldLabel>
-        <div className="flex flex-wrap gap-2">
-          {COLOR_OPTIONS.map((color) => (
-            <button
-              key={color}
-              onClick={() => toggleColor(color)}
-              className={`
-                px-4 py-2 rounded-xl border-2 text-sm font-medium
-                transition-all duration-200 cursor-pointer min-h-[44px]
-                ${data.colors.includes(color)
-                  ? 'bg-pastel_petal-400 text-white border-pastel_petal-400 shadow-sm'
-                  : 'bg-thistle-900 text-thistle-300 border-thistle-600 hover:border-pastel_petal-400 hover:bg-thistle-800'
-                }
-              `}
-            >
-              {color}
-            </button>
-          ))}
-        </div>
-        {data.colors.length === 0 && (
-          <p className="text-xs text-baby_pink-400 mt-1">Selecciona al menos un color.</p>
-        )}
+        <FieldLabel required>Color del pelaje</FieldLabel>
+        <input
+          id="pet-color"
+          type="text"
+          value={data.color}
+          onChange={(e) => onChange({ color: e.target.value })}
+          placeholder="Ej: Dorado, Negro con manchas blancas, Blanco, Tricolor…"
+          className={inputClass}
+        />
+        <p className="text-xs text-thistle-500 mt-1">
+          Escribe el color o combinación de colores de la mascota.
+        </p>
       </div>
 
       {/* Características físicas */}

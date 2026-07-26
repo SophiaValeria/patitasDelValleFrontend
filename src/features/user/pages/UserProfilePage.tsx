@@ -368,23 +368,25 @@ const UserProfilePage: React.FC = () => {
 
           {/* User Info Bar */}
           <div className="px-6 sm:px-8 pb-8 relative pt-0">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 -mt-16 sm:-mt-20 mb-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-4 mb-6">
               
               {/* Avatar + Nombre */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name}
-                    className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover border-4 border-white shadow-xl bg-white"
-                  />
-                ) : (
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-thistle-300 via-baby_pink-400 to-sky_blue-400 text-white font-black text-3xl sm:text-4xl flex items-center justify-center border-4 border-white shadow-xl">
-                    {getInitials(user.name)}
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
+                <div className="-mt-14 sm:-mt-16 shrink-0">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl object-cover border-4 border-white shadow-xl bg-white"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-thistle-300 via-baby_pink-400 to-sky_blue-400 text-white font-black text-3xl sm:text-4xl flex items-center justify-center border-4 border-white shadow-xl">
+                      {getInitials(user.name)}
+                    </div>
+                  )}
+                </div>
 
-                <div className="pt-2 sm:pt-12">
+                <div className="mt-2 sm:mt-0 sm:pb-1">
                   <h1 className="text-2xl sm:text-3xl font-black text-thistle-100 tracking-tight">
                     {user.name}
                   </h1>
@@ -398,7 +400,7 @@ const UserProfilePage: React.FC = () => {
               </div>
 
               {/* Botón Acción Principal */}
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-3 w-full sm:w-auto sm:self-end">
                 <button
                   onClick={handleOpenEditModal}
                   className="w-full sm:w-auto px-4 py-3 rounded-2xl border-2 border-thistle-600 text-thistle-100 hover:border-baby_pink-400 hover:text-baby_pink-400 font-bold text-sm transition-all duration-200 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"

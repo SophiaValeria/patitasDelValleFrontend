@@ -165,7 +165,7 @@ const validateStep = (step: number, data: ReportFormData): string | null => {
       return null;
     case 1:
       if (!data.species) return 'Debes seleccionar la especie de la mascota.';
-      if (data.colors.length === 0) return 'Debes seleccionar al menos un color.';
+      if (!data.color.trim()) return 'Debes ingresar el color de la mascota.';
       return null;
     case 2:
       if (!data.region) return 'Debes seleccionar una región.';
