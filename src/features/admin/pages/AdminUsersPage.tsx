@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/services/api';
 import { UserRole, type User } from '@/types';
-import { formatRut } from '@/utils/formatters';
+import { formatRut, formatRegion } from '@/utils/formatters';
 
 const AdminUsersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -275,7 +275,7 @@ const AdminUsersPage: React.FC = () => {
                         {/* Ubicación */}
                         <td className="px-6 py-4 text-xs font-medium text-thistle-300">
                           <p className="font-semibold text-thistle-200">
-                            {u.commune && u.region ? `${u.commune}, ${u.region}` : u.commune || u.region || 'Chile'}
+                            {u.commune && u.region ? `${u.commune}, ${formatRegion(u.region)}` : u.commune || formatRegion(u.region) || 'Chile'}
                           </p>
                           <p className="text-[11px] text-thistle-400 truncate max-w-[180px]">
                             {u.address || 'Sin dirección registrada'}
@@ -351,7 +351,7 @@ const AdminUsersPage: React.FC = () => {
                       <div className="col-span-2 pt-2 border-t border-thistle-800/80">
                         <p className="text-[10px] font-bold text-thistle-400 uppercase">Residencia</p>
                         <p className="font-semibold text-thistle-200 mt-0.5">
-                          {u.commune && u.region ? `${u.commune}, ${u.region}` : u.address || 'Chile'}
+                          {u.commune && u.region ? `${u.commune}, ${formatRegion(u.region)}` : u.address || 'Chile'}
                         </p>
                       </div>
                     </div>

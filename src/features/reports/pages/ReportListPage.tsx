@@ -18,6 +18,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReportType } from '@/types';
+import { formatSpecies, formatSize, formatSex } from '@/utils/formatters';
 import { useReportFilters } from '../hooks/useReportFilters';
 import ReportCard from '../components/ReportCard';
 import ReportFiltersPanel from '../components/ReportFiltersPanel';
@@ -320,7 +321,7 @@ const ReportListPage = () => {
         {activeFilterCount > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {filters.species && (
-              <FilterChip label={`Especie: ${filters.species}`} onRemove={() => setFilter('species', '')} />
+              <FilterChip label={`Especie: ${formatSpecies(filters.species)}`} onRemove={() => setFilter('species', '')} />
             )}
             {filters.region && (
               <FilterChip label={`Región: ${filters.region}`} onRemove={() => setFilter('region', '')} />
@@ -330,13 +331,13 @@ const ReportListPage = () => {
             )}
             {filters.size && (
               <FilterChip
-                label={`Tamaño: ${{ SMALL: 'Pequeño', MEDIUM: 'Mediano', LARGE: 'Grande' }[filters.size] || filters.size}`}
+                label={`Tamaño: ${formatSize(filters.size)}`}
                 onRemove={() => setFilter('size', '')}
               />
             )}
             {filters.sex && (
               <FilterChip
-                label={`Sexo: ${{ MALE: 'Macho', FEMALE: 'Hembra', UNKNOWN: 'Desconocido' }[filters.sex] || filters.sex}`}
+                label={`Sexo: ${formatSex(filters.sex)}`}
                 onRemove={() => setFilter('sex', '')}
               />
             )}

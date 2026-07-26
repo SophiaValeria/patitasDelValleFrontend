@@ -6,7 +6,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { ReportType } from '@/types';
-import { formatSpecies, formatSize, formatImageUrl } from '@/utils/formatters';
+import { formatSpecies, formatSize, formatImageUrl, formatRegion } from '@/utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -62,10 +62,10 @@ export const REPORT_TYPE_CONFIG: Record<
 
 export const formatLocation = (loc: any): string => {
   if (!loc) return 'Chile';
-  if (typeof loc === 'string') return loc;
+  if (typeof loc === 'string') return formatRegion(loc);
   const parts: string[] = [];
   if (loc.comuna) parts.push(loc.comuna);
-  if (loc.region) parts.push(loc.region);
+  if (loc.region) parts.push(formatRegion(loc.region));
   return parts.length > 0 ? parts.join(', ') : loc.address || 'Chile';
 };
 

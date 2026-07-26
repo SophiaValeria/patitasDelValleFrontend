@@ -158,4 +158,62 @@ export const formatRut = (rut?: string): string => {
   return `${formattedBody}-${dv}`;
 };
 
+/**
+ * Dataset de regiones para mapeo rápido si es un slug o texto sin formato
+ */
+const REGIONES_LABEL_MAP: Record<string, string> = {
+  'arica-parinacota': 'Arica y Parinacota',
+  'tarapaca': 'Tarapacá',
+  'antofagasta': 'Antofagasta',
+  'atacama': 'Atacama',
+  'coquimbo': 'Coquimbo',
+  'valparaiso': 'Valparaíso',
+  'region-metropolitana': 'Región Metropolitana de Santiago',
+  'rm': 'Región Metropolitana de Santiago',
+  'ohiggins': "O'Higgins",
+  'maule': 'Maule',
+  'nuble': 'Ñuble',
+  'biobio': 'Biobío',
+  'araucania': 'La Araucanía',
+  'los-rios': 'Los Ríos',
+  'los-lagos': 'Los Lagos',
+  'aysen': 'Aysén',
+  'magallanes': 'Magallanes',
+};
+
+/**
+ * Formatea el texto de una región para asegurar que se muestre en un formato legible
+ * (ej. convierte 'arica-parinacota' o 'valparaiso' -> 'Arica y Parinacota', 'Valparaíso').
+ */
+export const formatRegion = (region?: string): string => {
+  if (!region) return '';
+
+  const clean = region.trim().toLowerCase();
+
+  // Buscar en el diccionario de slugs
+  if (REGIONES_LABEL_MAP[clean]) {
+    return REGIONES_LABEL_MAP[clean];
+  }
+
+  // Si ya tiene acentos o formato con mayúsculas/espacios
+  // Reemplazar guiones/guiones bajos
+  const withSpaces = region.replace(/[-_]/g, ' ');
+
+  // Si ya es un texto legible (ej: "Región Metropolitana de Santiago" o "Valparaíso")
+  if (withSpaces.match(/[A-ZÁÉÍÓÚÑa-záéíóúñ]/)) {
+    return withSpaces
+      .split(' ')
+      .map((word) => {
+        const lower = word.toLowerCase();
+        if (['y', 'de', 'del', 'la', 'las', 'los'].includes(lower)) return lower;
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(' ')
+      .replace(/^(\w)/, (m) => m.toUpperCase());
+  }
+
+  return region;
+};
+
+
 

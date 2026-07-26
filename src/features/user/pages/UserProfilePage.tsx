@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportStatus, ReportType, UserRole } from '@/types';
-import { formatSpecies, formatImageUrl } from '@/utils/formatters';
+import { formatSpecies, formatImageUrl, formatRegion } from '@/utils/formatters';
 import { CHILE_REGIONS } from '@/features/reports/data/chile-locations';
 
 interface UserReport {
@@ -196,7 +196,7 @@ const UserProfilePage: React.FC = () => {
       if (typeof loc === 'string') return loc;
       const parts = [];
       if (loc.comuna) parts.push(loc.comuna);
-      if (loc.region) parts.push(loc.region);
+      if (loc.region) parts.push(formatRegion(loc.region));
       return parts.length > 0 ? parts.join(', ') : loc.address || 'Ubicación no especificada';
     };
 
@@ -444,7 +444,11 @@ const UserProfilePage: React.FC = () => {
               <div className="space-y-1">
                 <p className="text-xs font-bold text-thistle-400 uppercase tracking-wider">Región y Comuna</p>
                 <p className="text-sm font-semibold text-thistle-100 truncate">
-                  {user.commune && user.region ? `${user.commune}, ${user.region}` : 'Chile'}
+                  {user.commune && user.region
+                    ? `${user.commune}, ${formatRegion(user.region)}`
+                    : user.region
+                    ? formatRegion(user.region)
+                    : 'Chile'}
                 </p>
               </div>
 

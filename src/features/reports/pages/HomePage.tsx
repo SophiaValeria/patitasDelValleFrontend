@@ -8,10 +8,11 @@
  *  3. CTA de reporte flotante
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReportType } from '@/types';
-import ReportCard, { type ReportCardData } from '../components/ReportCard';
+import apiClient from '@/services/api';
+import ReportCard, { normalizeReport, type ReportCardData } from '../components/ReportCard';
 
 // ---------------------------------------------------------------------------
 // 6 tarjetas de respaldo: 2 por tipo (LOST, ADOPTION, FOUND), las más recientes
@@ -96,6 +97,42 @@ const RECENT_MOCK_REPORTS: ReportCardData[] = [
 const HomePage = () => {
   const navigate = useNavigate();
   const [heroSearch, setHeroSearch] = useState('');
+  const [recentReports, setRecentReports] = useState<ReportCardData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchRecentReports = async () => {
+      setIsLoading(true);
+      try {
+        // Consultar 2 reportes activos de cada tipo (el endpoint GET /reports filtra estrictamente status: ACTIVE)
+        const [resLost, resAdoption, resFound] = await Promise.all([
+          apiClient.get('/reports', { params: { type: ReportType.LOST, limit: 2 } }),
+          apiClient.get('/reports', { params: { type: ReportType.ADOPTION, limit: 2 } }),
+          apiClient.get('/reports', { params: { type: ReportType.FOUND, limit: 2 } }),
+        ]);
+
+        const getItemsForType = (apiResponseData: any[], type: ReportType) => {
+          const normalized = (apiResponseData || []).map(normalizeReport);
+          if (normalized.length >= 2) return normalized.slice(0, 2);
+          const mocksForType = RECENT_MOCK_REPORTS.filter((r) => r.type === type);
+          return [...normalized, ...mocksForType].slice(0, 2);
+        };
+
+        const lostList = getItemsForType(resLost.data?.data, ReportType.LOST);
+        const adoptionList = getItemsForType(resAdoption.data?.data, ReportType.ADOPTION);
+        const foundList = getItemsForType(resFound.data?.data, ReportType.FOUND);
+
+        setRecentReports([...lostList, ...adoptionList, ...foundList]);
+      } catch (error) {
+        console.error('Error al consultar últimos reportes:', error);
+        setRecentReports(RECENT_MOCK_REPORTS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecentReports();
+  }, []);
 
   const categoryButtons = [
     {
@@ -240,11 +277,25 @@ const HomePage = () => {
         </div>
 
         {/* ── Grid de 6 tarjetas ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {RECENT_MOCK_REPORTS.map((report) => (
-            <ReportCard key={report.id} report={report} compact />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden border border-thistle-700 animate-pulse h-64">
+                <div className="h-40 bg-thistle-800" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-thistle-800 rounded-lg w-2/3" />
+                  <div className="h-3 bg-thistle-800 rounded-lg w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {recentReports.map((report) => (
+              <ReportCard key={report.id} report={report} compact />
+            ))}
+          </div>
+        )}
 
         {/* ── Botón CTA centrado ── */}
         <div className="flex justify-center mt-8">

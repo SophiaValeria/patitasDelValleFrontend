@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/services/api';
 import { ReportStatus, ReportType } from '@/types';
-import { formatSpecies, formatImageUrl } from '@/utils/formatters';
+import { formatSpecies, formatImageUrl, formatRegion } from '@/utils/formatters';
 
 interface AdminReport {
   id: string;
@@ -53,7 +53,7 @@ const AdminReportReviewPage: React.FC = () => {
               })
             : 'Fecha desconocida',
           location: raw.location
-            ? `${raw.location.comuna || ''}, ${raw.location.region || ''}`
+            ? `${raw.location.comuna || ''}, ${formatRegion(raw.location.region || '')}`
             : 'Ubicación no disponible',
           authorName: raw.author?.name || 'Autor Desconocido',
           authorEmail: raw.author?.email || 'Sin Email',

@@ -18,7 +18,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import useAuth from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import { ReportType, ReportStatus } from '@/types';
-import { formatSpecies, formatSex, formatSize, formatImageUrl, formatStatus } from '@/utils/formatters';
+import { formatSpecies, formatSex, formatSize, formatImageUrl, formatStatus, formatRegion } from '@/utils/formatters';
 
 // ---------------------------------------------------------------------------
 // Interfaz interna para el detalle del reporte
@@ -115,6 +115,7 @@ const ReportDetailPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchReportDetail = async () => {
       if (!id) return;
       setIsLoading(true);
@@ -397,7 +398,7 @@ const ReportDetailPage: React.FC = () => {
                 <div>
                   <p className="text-xs font-bold text-thistle-400 uppercase">Comuna y Región</p>
                   <p className="text-base font-bold text-thistle-100">
-                    {report.comuna ? `${report.comuna}, ${report.region}` : report.region || 'Chile'}
+                    {report.comuna ? `${report.comuna}, ${formatRegion(report.region)}` : formatRegion(report.region) || 'Chile'}
                   </p>
                 </div>
 

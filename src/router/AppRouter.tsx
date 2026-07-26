@@ -11,12 +11,26 @@
  *       valores provenientes de AuthContext cuando esté implementado.
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { UserRole } from '@/types';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
 import HomePage from '@/features/reports/pages/HomePage';
 import CreateReportPage from '@/features/reports/pages/CreateReportPage';
+
+// ---------------------------------------------------------------------------
+// ScrollToTop: Restaura el scroll al inicio (top: 0) en cada cambio de ruta
+// ---------------------------------------------------------------------------
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 // ---------------------------------------------------------------------------
 // Placeholders de páginas — serán reemplazados por los componentes reales
@@ -57,6 +71,7 @@ const AppRouter = () => {
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ScrollToTop />
       <Routes>
         {/* ---------------------------------------------------------------- */}
         {/* RUTAS EN MAIN LAYOUT (Header + Footer)                           */}
